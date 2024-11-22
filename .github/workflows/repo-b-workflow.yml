@@ -1,0 +1,17 @@
+name: Run hel.sh Script
+
+on:
+  repository_dispatch:
+    types: [run-hel-script]  # Match the event type from Repo A
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo B
+        uses: actions/checkout@v2
+
+      - name: Run hel.sh
+        run: |
+          chmod +x ./hel.sh  # Ensure the script is executable
+          ./hel.sh            # Execute the script
