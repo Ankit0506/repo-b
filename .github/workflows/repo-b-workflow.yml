@@ -2,7 +2,7 @@ name: Run hel.sh Script
 
 on:
   repository_dispatch:
-    types: [run-hel-script]  # Match the event type from Repo A
+    types: run-hel-script
 
 jobs:
   run-script:
