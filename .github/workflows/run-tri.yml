@@ -2,7 +2,7 @@ name: My Target Workflow
 
 on:
   repository_dispatch:
-    types: [dispatch-event]
+    types: [trigger-workflow]
     
 jobs:
   build:
