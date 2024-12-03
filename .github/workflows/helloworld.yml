@@ -1,0 +1,12 @@
+name: Hello World Workflow
+
+on:
+  workflow_dispatch:  # Allows manual triggering of the workflow
+
+jobs:
+  say-hello:
+    runs-on: ubuntu-latest  # Specify the environment to run the job
+
+    steps:
+      - name: Print Hello World
+        run: echo "Hello, World!"  # Command to print Hello World
