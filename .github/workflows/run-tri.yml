@@ -9,9 +9,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-        ref: ${{ github.event.client_payload.sha }}
+      - name: Print Hello World
+        run: echo "Hello, World!"  # Command to print Hello World
 
-      # Add your workflow steps here
