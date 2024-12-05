@@ -1,0 +1,13 @@
+name: Trigger Repo B GitHub workflow
+on:
+  repository_dispatch:
+    types: [trigger-workflow]
+    
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Print Hello World
+        run: echo "Hello, World!"  # Command to print Hello World
+
