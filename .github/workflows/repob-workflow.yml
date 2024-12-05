@@ -11,3 +11,9 @@ jobs:
       - name: Print Hello World
         run: echo "Hello, World!"  # Command to print Hello World
 
+      - name: Make hel.sh executable
+        run: chmod +x hel.sh  # Ensure the script has execute permissions
+
+      - name: Run hel.sh
+        run: ./hel.sh  # Execute the hel.sh script
+
