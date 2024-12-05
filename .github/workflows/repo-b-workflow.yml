@@ -1,17 +1,17 @@
-name: Run hel.sh on Dispatch Event
+# name: Run hel.sh on Dispatch Event
 
-on:
-  repository_dispatch:
-    types: [run-hel-script]  # Listen for the custom event type
+# on:
+#   repository_dispatch:
+#     types: [run-hel-script]  # Listen for the custom event type
 
-jobs:
-  run-hel-script:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repo B
-        uses: actions/checkout@v3
+# jobs:
+#   run-hel-script:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout Repo B
+#         uses: actions/checkout@v3
 
-      - name: Run hel.sh
-        run: |
-          chmod +x ./path/to/hel.sh  # Ensure the script is executable
-          ./path/to/hel.sh            # Execute the script
+#       - name: Run hel.sh
+#         run: |
+#           chmod +x ./path/to/hel.sh  # Ensure the script is executable
+#           ./path/to/hel.sh            # Execute the script
