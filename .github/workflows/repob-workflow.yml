@@ -1,23 +1,35 @@
-name: Trigger Repo B GitHub workflow
+name: syc-qa-auto
+
 on:
-  repository_dispatch:
-    types: [trigger-workflow]
-    
+    workflow_dispatch:
+    push:
+      branches:
+        - main  
+
 jobs:
-  build:
-    runs-on: ubuntu-latest
-
+  smoke-tests:
+    runs-on: ubuntu-22.04
     steps:
-      - name: Print Hello World
-        run: echo "Hello, World!"  # Command to print Hello World
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-      - name: List files
-        run: ls -la  # Debugging step to list files
-      
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.11' 
 
-      - name: Make hel.sh executable
-        run: chmod +x ../../hel.sh  # Ensure the script has execute permissions
+      - name: Cache pip dependencies
+        uses: actions/cache@v2
+        with:
+          path: .pip_cache
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
 
-      - name: Run hel.sh
-        run: ../../hel.sh  # Execute the hel.sh script
+      - name: Install dependencies
+        run: |
+          mkdir -p .pip_cache
+          pip install --cache-dir .pip_cache -r requirements.txt
 
+      - name: Run Main.py
+        run: python Main.py
