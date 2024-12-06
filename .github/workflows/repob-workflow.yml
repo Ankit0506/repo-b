@@ -2,9 +2,9 @@ name: syc-qa-auto
 
 on:
     workflow_dispatch:
-    push:
-      branches:
-        - main  
+    # push:
+    #   branches:
+    #     - main  
 jobs:
   smoke-tests:
     runs-on: ubuntu-22.04
