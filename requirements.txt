@@ -1,0 +1,8 @@
+pandas==2.2.1
+pillow==10.2.0
+PyQt6==6.7.0
+PyYAML==6.0.1
+robotframework==7.0
+robotframework-excel==1.0.0b4
+robotframework-jsonlibrary==0.5
+robotframework-seleniumlibrary==6.2.0
