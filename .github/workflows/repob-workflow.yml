@@ -1,34 +1,34 @@
-name: syc-qa-auto
+# name: syc-qa-auto
 
-on:
-    workflow_dispatch:
-    push:
-      branches:
-        - main  
-jobs:
-  smoke-tests:
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+# on:
+#     workflow_dispatch:
+#     push:
+#       branches:
+#         - main  
+# jobs:
+#   smoke-tests:
+#     runs-on: ubuntu-22.04
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v2
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.11' 
+#       - name: Set up Python
+#         uses: actions/setup-python@v2
+#         with:
+#           python-version: '3.11' 
 
-      - name: Cache pip dependencies
-        uses: actions/cache@v3
-        with:
-          path: .pip_cache
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
+#       - name: Cache pip dependencies
+#         uses: actions/cache@v3
+#         with:
+#           path: .pip_cache
+#           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+#           restore-keys: |
+#             ${{ runner.os }}-pip-
 
-      - name: Install dependencies
-        run: |
-          mkdir -p .pip_cache
-          pip install --cache-dir .pip_cache -r requirements.txt
+#       - name: Install dependencies
+#         run: |
+#           mkdir -p .pip_cache
+#           pip install --cache-dir .pip_cache -r requirements.txt
 
-      - name: Run Main.py
-        run: python Main.py
+#       - name: Run Main.py
+#         run: python Main.py
