@@ -1,12 +1,31 @@
 name: Example Workflow
 
+# on:
+#   workflow_dispatch:
+#     inputs:
+#       logLevel:
+#         description: 'Log level'
+#         required: true
+#         default: 'warning'
+#         type: choice
+#         options:
+#           - warning
+#           - info
+#           - error
+
+# jobs:
+#   print-log-level:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Print Log Level
+#         run-name: echo "The selected log level is: ${{ inputs.logLevel }}"
+
 on:
   workflow_dispatch:
     inputs:
-      logLevel:
-        description: 'Log level'
-        required: true
-        default: 'warning'
+      username:
+        description: 'A username passed from the caller workflow'
+        required: false
         type: choice
         options:
           - warning
@@ -14,8 +33,9 @@ on:
           - error
 
 jobs:
-  print-log-level:
+  print-username:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Print Log Level
-        run: echo "The selected log level is: ${{ inputs.logLevel }}"
+      - name: Print the input name to STDOUT
+        run: echo The username is ${{ inputs.username }}
