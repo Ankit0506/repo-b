@@ -1,4 +1,5 @@
 name: Example Workflow
+
 on:
   workflow_dispatch:
     inputs:
@@ -17,7 +18,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Print Log Level
-        run: echo "hello"
-        #run: echo "The selected log level is: ${{ github.event.inputs.logLevel }}"
-
-
+        run: echo "The selected log level is: ${{ inputs.logLevel }}"
