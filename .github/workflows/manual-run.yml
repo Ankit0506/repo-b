@@ -15,12 +15,10 @@ on:
       tags:
         description: 'Test scenario tags'
         required: true
-      # branch:
-      #   description: 'Branch to run the workflow on'
-      #   required: true
-      #   default: 'main'
-      #   type: choice
-      #   options:
-      #     - feature
-      #     - malta
-      #     - malta-master
+
+jobs:
+  print-log-level:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print Log Level
+        run: echo "The selected log level is: ${{ github.event.inputs.logLevel }}"
