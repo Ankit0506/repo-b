@@ -1,5 +1,4 @@
 name: Example Workflow
-
 on:
   workflow_dispatch:
     inputs:
@@ -12,9 +11,6 @@ on:
           - warning
           - info
           - error
-      tags:
-        description: 'Test scenario tags'
-        required: true
 
 jobs:
   print-log-level:
@@ -22,3 +18,5 @@ jobs:
     steps:
       - name: Print Log Level
         run: echo "The selected log level is: ${{ github.event.inputs.logLevel }}"
+
+
