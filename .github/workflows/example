@@ -1,0 +1,21 @@
+name: Workflow file
+
+on:
+  workflow_dispatch:
+    inputs:
+      username:
+        description: 'A username passed from the caller workflow'
+        required: false
+        type: choice
+        options:
+          - warning
+          - info
+          - error
+
+jobs:
+  print-username:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Print the input name to STDOUT
+        run: echo The username is ${{ inputs.username }}
