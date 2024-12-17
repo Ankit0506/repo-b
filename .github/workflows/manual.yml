@@ -2,7 +2,7 @@ name: Database Backup Workflows of copy job
 on: 
   push:
     branches:
-      - 'ar-db-dump-githubaction'
+      - 'main'
 
   workflow_dispatch:
     inputs:
