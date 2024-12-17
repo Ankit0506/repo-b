@@ -14,21 +14,21 @@ on:
           - mdr_sycamore_mdr_madison_staging_ps
           - db-name2
 
-      # db-instance:
-      #   description: 'Please put db name'
-      #   required: true
-      #   type: choice
-      #   options:
-      #     - aurora-postgres-sycamore-1-writer.staging.plat.sycamore-svc.com
-      #     - db-instance2
+      db-instance:
+        description: 'Please put db name'
+        required: true
+        type: choice
+        options:
+          - aurora-postgres-sycamore-1-writer.staging.plat.sycamore-svc.com
+          - db-instance2
 
-      # db-user:
-      #     description: 'Please put db name'
-      #     required: true
-      #     default: postgres
-      #     type: choice
-      #     options:
-      #       - db-user-name
+      db-user:
+          description: 'Please put db name'
+          required: true
+          default: postgres
+          type: choice
+          options:
+            - db-user-name
 
 jobs:
   connect-to-ec2:
