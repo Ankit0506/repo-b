@@ -3,7 +3,7 @@ name: Daily Morning Workflow
 on:
   schedule:
     # Cron syntax for 7 AM UTC daily
-    - cron: '0 14 45 * *'
+    - cron: '0 14 41 * *'
 
 jobs:
   daily-task:
