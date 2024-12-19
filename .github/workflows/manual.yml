@@ -1,115 +1,115 @@
-name: Database Backup Workflows of copy job
-on: 
-  push:
-    branches:
-      - 'main'
+# name: Database Backup Workflows of copy job
+# on: 
+#   push:
+#     branches:
+#       - 'main'
 
-  workflow_dispatch:
-    inputs:
-      db-name:
-        description: 'Please put db name'
-        required: true
-        type: choice
-        options:
-          - mdr_sycamore_mdr_madison_staging_ps
-          - db-name2
+#   workflow_dispatch:
+#     inputs:
+#       db-name:
+#         description: 'Please put db name'
+#         required: true
+#         type: choice
+#         options:
+#           - mdr_sycamore_mdr_madison_staging_ps
+#           - db-name2
 
-      db-instance:
-        description: 'Please put db name'
-        required: true
-        type: choice
-        options:
-          - aurora-postgres-sycamore-1-writer.staging.plat.sycamore-svc.com
-          - db-instance2
+#       db-instance:
+#         description: 'Please put db name'
+#         required: true
+#         type: choice
+#         options:
+#           - aurora-postgres-sycamore-1-writer.staging.plat.sycamore-svc.com
+#           - db-instance2
 
-      db-user:
-          description: 'Please put db name'
-          required: true
-          default: postgres
-          type: choice
-          options:
-            - db-user-name
+#       db-user:
+#           description: 'Please put db name'
+#           required: true
+#           default: postgres
+#           type: choice
+#           options:
+#             - db-user-name
 
-jobs:
-  connect-to-ec2:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
+# jobs:
+#   connect-to-ec2:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@v2
       
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-2
+#       - name: Configure AWS Credentials
+#         uses: aws-actions/configure-aws-credentials@v1
+#         with:
+#           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#           aws-region: us-east-2
 
-      - name: Take DB dump from RDS
-        run: |
-            sudo apt-get update -y && sudo apt-get install -y expect
-            TIMESTAMP=$(date +"%Y%m%d%H%M%S")
-            BACKUP_FILE="backup_${TIMESTAMP}.dump"
-            AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} 
-            AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} 
-            aws ssm send-command \
-            --document-name "AWS-RunShellScript" \
-            --targets "Key=instanceids,Values=i-0752df2421a8544af" \
-            --parameters 'commands=["PGPASSWORD=${{ secrets.RDS_PASSWORD }} pg_dump -Fc --no-acl --no-owner -h aurora-postgres-sycamore-1-writer.staging.plat.sycamore-svc.com -U ${{ inputs.db-user }} -d postgres > /tmp/${BACKUP_FILE}\"]'
+#       - name: Take DB dump from RDS
+#         run: |
+#             sudo apt-get update -y && sudo apt-get install -y expect
+#             TIMESTAMP=$(date +"%Y%m%d%H%M%S")
+#             BACKUP_FILE="backup_${TIMESTAMP}.dump"
+#             AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} 
+#             AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} 
+#             aws ssm send-command \
+#             --document-name "AWS-RunShellScript" \
+#             --targets "Key=instanceids,Values=i-0752df2421a8544af" \
+#             --parameters 'commands=["PGPASSWORD=${{ secrets.RDS_PASSWORD }} pg_dump -Fc --no-acl --no-owner -h aurora-postgres-sycamore-1-writer.staging.plat.sycamore-svc.com -U ${{ inputs.db-user }} -d postgres > /tmp/${BACKUP_FILE}\"]'
       
-      - name: Upload file to S3 bucket
-        run: |
-            sudo apt-get update -y && sudo apt-get install -y expect
-            AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
-            AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            aws ssm send-command \
-            --document-name "AWS-RunShellScript" \
-            --targets "Key=instanceids,Values=i-0752df2421a8544af" \
-            --parameters 'commands=["aws s3 cp /tmp/${BACKUP_FILE} s3://syc-gha-s3/ --sse AES256"]'
+#       - name: Upload file to S3 bucket
+#         run: |
+#             sudo apt-get update -y && sudo apt-get install -y expect
+#             AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+#             AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#             aws ssm send-command \
+#             --document-name "AWS-RunShellScript" \
+#             --targets "Key=instanceids,Values=i-0752df2421a8544af" \
+#             --parameters 'commands=["aws s3 cp /tmp/${BACKUP_FILE} s3://syc-gha-s3/ --sse AES256"]'
 
-      - name: Create Presigned URL for the uploaded dump file
-        run: |
-            sudo apt-get update -y && sudo apt-get install -y expect
-            AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
-            AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            TIMESTAMP=$(date +"%Y%m%d%H%M%S")
-            FILE_URL="presigned_${TIMESTAMP}.txt"
-            # Send command to create presigned URL and capture output
-            COMMAND_ID=$(aws ssm send-command \
-                --document-name "AWS-RunShellScript" \
-                --targets "Key=instanceids,Values=i-0752df2421a8544af" \
-                --parameters 'commands=["sudo rm -f /tmp/presigned_url.txt; sudo aws s3 presign s3://syc-gha-s3/${BACKUP_FILE} --expires-in 3600 > /tmp/${FILE_URL} 2>&1"]' \
-                --query "Command.CommandId" \
-                --output text)
+#       - name: Create Presigned URL for the uploaded dump file
+#         run: |
+#             sudo apt-get update -y && sudo apt-get install -y expect
+#             AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+#             AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#             TIMESTAMP=$(date +"%Y%m%d%H%M%S")
+#             FILE_URL="presigned_${TIMESTAMP}.txt"
+#             # Send command to create presigned URL and capture output
+#             COMMAND_ID=$(aws ssm send-command \
+#                 --document-name "AWS-RunShellScript" \
+#                 --targets "Key=instanceids,Values=i-0752df2421a8544af" \
+#                 --parameters 'commands=["sudo rm -f /tmp/presigned_url.txt; sudo aws s3 presign s3://syc-gha-s3/${BACKUP_FILE} --expires-in 3600 > /tmp/${FILE_URL} 2>&1"]' \
+#                 --query "Command.CommandId" \
+#                 --output text)
     
-            # Wait for the command to complete
-            sleep 10
+#             # Wait for the command to complete
+#             sleep 10
     
-            # Retrieve command output for presigned URL creation
-            OUTPUT=$(aws ssm get-command-invocation \
-                --command-id "$COMMAND_ID" \
-                --instance-id "i-0752df2421a8544af" \
-                --query "StandardOutputContent" \
-                --output text)
+#             # Retrieve command output for presigned URL creation
+#             OUTPUT=$(aws ssm get-command-invocation \
+#                 --command-id "$COMMAND_ID" \
+#                 --instance-id "i-0752df2421a8544af" \
+#                 --query "StandardOutputContent" \
+#                 --output text)
     
-            echo "Command Output: $OUTPUT"
+#             echo "Command Output: $OUTPUT"
     
-            # Check if the presigned_url.txt file was created and display its content
-            FILE_OUTPUT_COMMAND_ID=$(aws ssm send-command \
-                --document-name "AWS-RunShellScript" \
-                --targets "Key=instanceids,Values=i-0752df2421a8544af" \
-                --parameters 'commands=["if [ -f /tmp/${FILE_URL} ]; then cat /tmp/${FILE_URL}; else echo \"File not found\"; fi"]' \
-                --query "Command.CommandId" \
-                --output text)
+#             # Check if the presigned_url.txt file was created and display its content
+#             FILE_OUTPUT_COMMAND_ID=$(aws ssm send-command \
+#                 --document-name "AWS-RunShellScript" \
+#                 --targets "Key=instanceids,Values=i-0752df2421a8544af" \
+#                 --parameters 'commands=["if [ -f /tmp/${FILE_URL} ]; then cat /tmp/${FILE_URL}; else echo \"File not found\"; fi"]' \
+#                 --query "Command.CommandId" \
+#                 --output text)
     
-            # Wait for the command to complete
-            sleep 10 
+#             # Wait for the command to complete
+#             sleep 10 
     
-            # Retrieve command output for file content
-            FILE_OUTPUT=$(aws ssm get-command-invocation \
-                --command-id "$FILE_OUTPUT_COMMAND_ID" \
-                --instance-id "i-0752df2421a8544af" \
-                --query "StandardOutputContent" \
-                --output text)
+#             # Retrieve command output for file content
+#             FILE_OUTPUT=$(aws ssm get-command-invocation \
+#                 --command-id "$FILE_OUTPUT_COMMAND_ID" \
+#                 --instance-id "i-0752df2421a8544af" \
+#                 --query "StandardOutputContent" \
+#                 --output text)
     
-            echo "Presigned URL Output: $FILE_OUTPUT"
+#             echo "Presigned URL Output: $FILE_OUTPUT"
     
