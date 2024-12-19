@@ -1,18 +1,9 @@
-name: Daily Morning Workflow
-
-on:
+name: Release Management
+on: 
   schedule:
-    # Cron syntax to run every minute
-    - cron: '* * * * *'
-
+   - cron: "*/5 * * * *"
 jobs:
-  daily-task:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Run Daily Task
-        run: |
-          # Your specific task commands here
-          echo "Running daily workflow"
+      - uses: actions/checkout@v2
