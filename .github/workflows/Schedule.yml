@@ -20,9 +20,9 @@ on:
           - Production
         default: 'Development'
 
-  # push:
-  #   branches:
-  #     - main
+  push:
+    branches:
+      - main
   schedule:
     - cron: '30 23 * * *'  # 5:00 AM IST (runs at 23:30 UTC)
 
