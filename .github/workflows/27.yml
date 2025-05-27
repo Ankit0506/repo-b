@@ -1,21 +1,65 @@
-name: Manual Branch Run
+name: Manual and Schedule Workflow 
 
 on:
   workflow_dispatch:
     inputs:
-      target_branch:
-        description: 'Branch to run this workflow on'
+      product:
+        description: 'Product Name'
         required: true
-        default: 'main'
+        type: choice
+        options:
+          - MDR
+          - SCE
+      environment:
+        description: 'Environment'
+        required: true
+        type: choice
+        options:
+          - Takeda
+          - Missouri
+          - Production
+        default: 'Development'
+
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: '30 23 * * *'  # 5:00 AM IST (runs at 23:30 UTC)
 
 jobs:
-  manual-run:
-    runs-on: ubuntu-latest
+  smoke-tests:
+    runs-on: ubuntu-22.04
     steps:
-      - name: Checkout Selected Branch
-        uses: actions/checkout@v3
-        with:
-          ref: ${{ github.event.inputs.target_branch }}
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-      - name: Print Branch Info
-        run: echo "Running job on branch: ${{ github.event.inputs.target_branch }}"
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.11' 
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v3
+        with:
+          path: .pip_cache
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          mkdir -p .pip_cache
+          pip install --cache-dir .pip_cache -r requirements.txt
+          
+      - name: Update AutomationConfig.yaml
+        run: |
+          cat > AutomationConfig.yaml << EOF
+          Product: ${{ inputs.product }}
+          Environment: ${{ inputs.environment }}
+          EOF
+
+      - name: Display Configuration
+        run: cat AutomationConfig.yaml
+        
+      - name: Run Main.py
+        run: python Main.py
