@@ -1,0 +1,21 @@
+name: Manual Branch Run
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_branch:
+        description: 'Branch to run this workflow on'
+        required: true
+        default: 'main'
+
+jobs:
+  manual-run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Selected Branch
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.inputs.target_branch }}
+
+      - name: Print Branch Info
+        run: echo "Running job on branch: ${{ github.event.inputs.target_branch }}"
