@@ -1,18 +1,21 @@
-name: Run Job on Multiple Branches
+name: Run on Selected Branch
 
 on:
-  push:
-    branches:
-      - main
-      - branch1
-      - branch2
+  workflow_dispatch:
+    inputs:
+      target_branch:
+        description: 'Branch to run this workflow on'
+        required: true
+        default: 'main'
 
 jobs:
-  example-job:
+  run-on-input-branch:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
+      - name: Checkout Selected Branch
         uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.inputs.target_branch }}
 
       - name: Print Branch Name
-        run: echo "Running job on branch: ${{ github.ref_name }}"
+        run: echo "Running job on branch: ${{ github.event.inputs.target_branch }}"
