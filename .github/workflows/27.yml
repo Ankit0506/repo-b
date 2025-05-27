@@ -3,29 +3,9 @@ name: Manual and Schedule Workflow
 on:
   workflow_dispatch:
     inputs:
-      product:
-        description: 'Product Name'
-        required: true
-        type: choice
-        options:
-          - MDR
-          - SCE
-      environment:
-        description: 'Environment'
-        required: true
-        type: choice
-        options:
-          - Takeda
-          - Missouri
-          - Production
-        default: 'Development'
-
   push:
     branches:
       - main
-  schedule:
-    - cron: '30 23 * * *'  # 5:00 AM IST (runs at 23:30 UTC)
-
 jobs:
   smoke-tests:
     runs-on: ubuntu-22.04
