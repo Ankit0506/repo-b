@@ -1,0 +1,35 @@
+name: MDR feature Image build Workflow
+on:
+  push:
+    branches:
+      - 'master'
+      - 'miami-master'
+      - 'mdr3.3.1.0'
+      - 'malta-master'
+  workflow_dispatch:
+
+
+permissions:
+  id-token: write
+  contents: write
+
+env:
+  organization: "gug"
+  repository: "gug"
+  tag: "${{ github.event.inputs.branch }}"
+  full_env_name: "${{ github.event.inputs.environment }}"
+  remote_branch_name: "${{ github.repository }}/${{ github.event.inputs.branch }}"
+
+jobs:
+  runtimeInfo:
+    name: Print Input & Environment details
+    runs-on: self-hosted
+    steps:
+      - name: Show Runtime Env Values
+        run: |
+          echo ""
+          echo "Running Staging Release workflow with the following Env Values:"
+          echo ""
+          echo "Deploying Branch: ${{ github.event.inputs.branch }}"
+          echo "Deploying to Customer: ${{ github.event.inputs.customer }}"
+          echo "Deploying to Environment: ${{ github.event.inputs.environment }}"
