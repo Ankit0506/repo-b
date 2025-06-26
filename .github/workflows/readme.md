@@ -15,9 +15,12 @@ Helm Version
   - Fixed Duplicate config image issue fir nginx container
   - Node/POD Affinity added to PODS
   - Added Workoff_wait time
+  - 
 1.1.4
   - Included Nginx SSL ciphers
+    
 1.1.5
   - Heimdall config included
+    
 1.1.6
   - 
