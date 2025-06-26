@@ -21,6 +21,17 @@ Helm Version
     
 1.1.5
   - Heimdall config included
-    
-1.1.6
   - 
+1.1.6
+  - Removed DB connection handing code
+    
+1.1.7
+  - Fixed TLS support TLS1.3
+    
+1.2.0
+  - Removed AWS Key dependency added Role-arn
+1.2.1
+  - Added TLS 1.2 and TLS1.3
+  - Fixed 
+    
+
