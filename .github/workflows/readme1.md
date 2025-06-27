@@ -1,5 +1,4 @@
 # MDR Helm Version
-
 ## 1.0.1
 - Fixed ingress tagging issue.
 - Updated CPU and memory values from `md` & `sm` to `xl`.
