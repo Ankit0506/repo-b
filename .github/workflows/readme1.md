@@ -1,17 +1,17 @@
-### MDR Helm Version
+\### MDR Helm Version
 
 | Version          | Fix/Feature implemented                                                                 | Rule Added              |
 |------------------|-----------------------------------------------------------------------------------------|-----------------------  |
 | 1.0.1            | Fixed ingress tagging issue.                                                            |Corrected tag of LB added App=MDR tag|
 |                  | Updated CPU and memory values from `md` & `sm` to `xl`.                                 |Update the Value to CPU and Memory to x Series|
-|                  | Added worker pod as deployment.                                                         |                         |
-|                  | Introduced DBPool.                                                                      |db_pool                  |
+|                  | Added worker pod as deployment.                                                         |Worker Pod configuration added in deployment file and 5190 container port opened|
+|                  | Introduced DBPool.                                                                      |included db_pool: "10" value in common values|
 |                  | Added `env.common` parameter.                                                           |Added common environment Variable for DD_AGENT_HOST| 
 | 1.1.0            | Fixed issue with ingress tagging                                                        |                         |
 |                  | Added `Sendgrid_username` variable and API key.                                         |Sendgrid Username and Api key is added in k8s charts|
-|                  | Added AWS key in secrets.                                                               |secret_prefix            |                   
-|  1.1.1           | Included `SESSION_TIMEOUT` variable in MDR charts.                                      |session_timeout          |
-|                  | Added WAF configuration to load balancer.                                               |                         |
+|                  | Added AWS key in secrets.                                                               |Added Global Secret Prefix value in k8s secret file|                   
+|  1.1.1           | Included `SESSION_TIMEOUT` variable in MDR charts.                                      |Introduced SESSION_TIMEOUT value and added default value of 30 sec|
+|                  | Added WAF configuration to load balancer.                                               | WAF acl arn is added to lb  using ingress kubernetes fils                       |
 |  1.1.2           | Enabled DD profiling and DBM propagation.                                               |                         |
 |  1.1.3           | Enabled maintenance mode.                                                               |enable_maintenance_mode  |
 |                  | Fixed duplicate config image issue for Nginx container.                                 |                         |
