@@ -11,17 +11,15 @@
 |                  | Added `Sendgrid_username` variable and API key.                                         |Sendgrid Username and Api key is added in k8s charts|
 |                  | Added AWS key in secrets.                                                               |Added Global Secret Prefix value in k8s secret file|                   
 |  1.1.1           | Included `SESSION_TIMEOUT` variable in MDR charts.                                      |Introduced SESSION_TIMEOUT value and added default value of 30 sec|
-|                  | Added WAF configuration to load balancer.                                               | WAF acl arn is added to lb  using ingress kubernetes fils                       |
-|  1.1.2           | Enabled DD profiling and DBM propagation.                                               |                         |
-|  1.1.3           | Enabled maintenance mode.                                                               |enable_maintenance_mode  |
-|                  | Fixed duplicate config image issue for Nginx container.                                 |                         |
-|                  | Added node/POD affinity to pods.                                                        |                         |
-|                  | Added `Workoff_wait` time, made it optional, and set the default flag to false.         |                         |
-|                  | Fixed Nginx host header and server fingerprinting issue.                                |                         |
-|  1.1.4           | Included Nginx SSL ciphers.                                                             |                         |
-|  1.1.5           | Included Heimdall configuration.                                                        |                         |
-|  1.1.6           | Removed DB connection handling code.                                                    |                         |
-|                  | Delayed job workoff SIGTERM handling.                                                   |                         |            
+|                  | Added WAF configuration to load balancer.                                               | WAF acl arn is added to lb  using ingress kubernetes fils|
+|  1.1.2           | Enabled DD profiling and DBM propagation.                                               |DD_TRACE_SAMPLE_RATE=1,DD_DBM_PROPAGATION_MODE=full,DB_POOL is enabled |
+|  1.1.3           | Enabled maintenance mode.                                                               |enable_maintenance_mode default value is set to false |
+|                  | Added node/POD affinity to pods.                                                        |Included node selector and node affinity ON DEMAND value in deployment file|
+|                  | Added `Workoff_wait` time, made it optional, and set the default flag to false.         |Included workoff-wait-rake in volumeMount for job scheduling|
+|                  | Fixed Nginx host header and server fingerprinting issue.                                |Included Header in Nginx for Trasnport Security and Proxy|
+|  1.1.4           | Included Nginx SSL ciphers.                                                             |Disabled Weak Cipher and Enabled strong Cipher using nginx-cm file|
+|  1.1.5           | Included Heimdall configuration.                                                        |Included Heimdall configuration using deployment|
+|  1.1.6            |Delayed job workoff SIGTERM handling.                                                  |                         |        
 |                  | Enabled DB backup job.                                                                  | enable_database_backup  |
 |  1.1.7           | Fixed TLS support for TLS 1.3.                                                          |                         |
 |  1.2.0           | Removed AWS key dependency; added `Role-arn` as an environment variable.                |                         |
