@@ -3,12 +3,12 @@
 | Version          | Fix/Feature implemented                                                                 | Rule Added              |
 |------------------|-----------------------------------------------------------------------------------------|-----------------------  |
 | 1.0.1            | Fixed ingress tagging issue.                                                            |Corrected tag of LB added App=MDR tag|
-|                  | Updated CPU and memory values from `md` & `sm` to `xl`.                                 |                         |
+|                  | Updated CPU and memory values from `md` & `sm` to `xl`.                                 |Update the Value to CPU and Memory to x Series|
 |                  | Added worker pod as deployment.                                                         |                         |
 |                  | Introduced DBPool.                                                                      |db_pool                  |
-|                  | Added `env.common` parameter.                                                           |                         |
+|                  | Added `env.common` parameter.                                                           |Added common environment Variable for DD_AGENT_HOST| 
 | 1.1.0            | Fixed issue with ingress tagging                                                        |                         |
-|                  | Added `Sendgrid_username` variable and API key.                                         |                         |
+|                  | Added `Sendgrid_username` variable and API key.                                         |Sendgrid Username and Api key is added in k8s charts|
 |                  | Added AWS key in secrets.                                                               |secret_prefix            |                   
 |  1.1.1           | Included `SESSION_TIMEOUT` variable in MDR charts.                                      |session_timeout          |
 |                  | Added WAF configuration to load balancer.                                               |                         |
