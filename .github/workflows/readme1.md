@@ -2,7 +2,7 @@
 
 | Version          | Fix/Feature implemented                                                                 | Rule Added              |
 |------------------|-----------------------------------------------------------------------------------------|-----------------------  |
-| 1.0.1            | Fixed ingress tagging issue.                                                            |alb.ingress.kubernetes.io|
+| 1.0.1            | Fixed ingress tagging issue.                                                            |Corrected tag of LB added App=MDR tag|
 |                  | Updated CPU and memory values from `md` & `sm` to `xl`.                                 |                         |
 |                  | Added worker pod as deployment.                                                         |                         |
 |                  | Introduced DBPool.                                                                      |db_pool                  |
