@@ -2,14 +2,14 @@
 
 | Version          | Fix/Feature implemented                                                                 | Rule Added              |
 |------------------|-----------------------------------------------------------------------------------------|-----------------------  |
-| 1.0.1            | Fixed ingress tagging issue.                                                            |                         |
+| 1.0.1            | Fixed ingress tagging issue.                                                            |alb.ingress.kubernetes.io|
 |                  | Updated CPU and memory values from `md` & `sm` to `xl`.                                 |                         |
 |                  | Added worker pod as deployment.                                                         |                         |
 |                  | Introduced DBPool.                                                                      |db_pool                  |
-|                  | Added AWS key in secrets.                                                               |secret_prefix            |
 |                  | Added `env.common` parameter.                                                           |                         |
 | 1.1.0            | Fixed issue with ingress tagging                                                        |                         |
 |                  | Added `Sendgrid_username` variable and API key.                                         |                         |
+|                  | Added AWS key in secrets.                                                               |secret_prefix            |                   
 |  1.1.1           | Included `SESSION_TIMEOUT` variable in MDR charts.                                      |                         |
 |                  | Added WAF configuration to load balancer.                                               |                         |
 |  1.1.2           | Enabled DD profiling and DBM propagation.                                               |                         |
