@@ -10,7 +10,7 @@
 | 1.1.0            | Fixed issue with ingress tagging                                                        |                         |
 |                  | Added `Sendgrid_username` variable and API key.                                         |                         |
 |                  | Added AWS key in secrets.                                                               |secret_prefix            |                   
-|  1.1.1           | Included `SESSION_TIMEOUT` variable in MDR charts.                                      |                         |
+|  1.1.1           | Included `SESSION_TIMEOUT` variable in MDR charts.                                      |session_timeout          |
 |                  | Added WAF configuration to load balancer.                                               |                         |
 |  1.1.2           | Enabled DD profiling and DBM propagation.                                               |                         |
 |  1.1.3           | Enabled maintenance mode.                                                               |enable_maintenance_mode  |
