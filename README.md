@@ -2,15 +2,15 @@
 
 | Version          | Fix/Feature implemented                                                                 | Rule Added              |
 |------------------|-----------------------------------------------------------------------------------------|-----------------------  |
-| 1.0.1            | Fixed the ingress tagging issue.                                                        |Corrected the tag of the load balancer by adding the App=MDR tag.|
-|                  | Updated CPU and memory values from md and sm to xl.                                     |Updated the CPU and memory values to the x Series.|
+| 1.0.1            | Updated CPU and memory values from md and sm to xl.                                     |Updated the CPU and memory values to the x Series.|
 |                  | Included worker pod as deployment.                                                      |Added worker pod configuration in the deployment file and opened container port 5190.|
 |                  | Added DBPool configuration.                                                             |Included db_pool: "10" value in common values.|
 |                  | Introduced env.common parameter.                                                        |Added a common environment variable for DD_AGENT_HOST| 
-| 1.1.0            | Added Sendgrid_username variable and API key.                                           |Included Sendgrid username and API key in Kubernetes charts|
+| 1.1.0            | Added Sendgrid_username variable and API key for miami release.                         |Included Sendgrid username and API key in Kubernetes charts|
 |                  | Included AWS key as secrets.                                                            |Added global secret prefix value in the Kubernetes secret file|                   
 |  1.1.1           | Introduced SESSION_TIMEOUT variable in MDR charts.                                      |Set the default value of SESSION_TIMEOUT to 30 seconds|
 |                  | Configured WAF settings for the load balancer.                                          |Added WAF ACL ARN to the load balancer using the ingress Kubernetes file|
+|                  | Fixed the ingress tagging issue.                                                        |Corrected the tag of the load balancer by adding the App=MDR tag.|
 |  1.1.2           | Enabled Datadog profiling and database monitoring propagation.                          |Set DD_TRACE_SAMPLE_RATE=1, DD_DBM_PROPAGATION_MODE=full, and enabled DB_POOL|
 |  1.1.3           | Enabled maintenance mode.                                                               |Set the default value of enable_maintenance_mode to false|
 |                  | Added nod and pod affinity configurations.                                              |Included node selector and node affinity ON DEMAND value in the deployment file|
