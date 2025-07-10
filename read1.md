@@ -106,16 +106,28 @@ Version 1.1.4
 
 Version 1.1.5
 
-    Added Heimdall configuration.
-    → Included Heimdall configuration in the deployment.
+    Heimdall Database Configuration Support
+    → Added conditional heimdall support in environment variables
+      Added support to inject Heimdall proxy values when global.heimdall.enabled = true. This allows redirecting database traffic through the Heimdall proxy if enabled.
+      Modified resources:
+        create-db/templates/batch.yaml
+        migrate-db/templates/batch.yaml
+        worker/templates/scaled-job.yaml
+      Injected env vars when heimdall.enabled is true: DATABASE_HOST , DATABASE_PORT , POSTGRES_HOST
 
 Version 1.1.6
 
     Improved SIGTERM handling for delayed job workoff.
     → Added code in workoff_wait.rake to manage jobs locked by pods.
 
-    Enabled database backup.
-    → Activated the database backup dump job with a default value of false for enable_database_backup.
+    Backup DB Job Introduced
+    → Added: New backup-db job for DB backups
+    job implemented to:
+        Perform a pg_dump of the database
+        Upload the .dump file to S3 under DBDUMP/ path
+        Clean up backup from local volume
+    Conditional execution based on:
+    global.enable_database_backup parameter
 
 Version 1.1.7
 
