@@ -98,8 +98,11 @@ Version 1.1.3
 
 Version 1.1.4
 
-    Configured Nginx SSL ciphers.
-    → Disabled weak ciphers and enabled strong ciphers using the nginx-cm file.
+    Security Hardening Changes
+    → Header Sanitization
+      Cipher Suite Enforcement
+      Timeouts & Buffers
+      Compression & Caching
 
 Version 1.1.5
 
