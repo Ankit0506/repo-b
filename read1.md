@@ -98,7 +98,7 @@ Version 1.1.3
 
 Version 1.1.4
 
-    Security Hardening Changes
+    Security Hardening Changes in nginx-cm.yaml
     → Header Sanitization
       Cipher Suite Enforcement
       Timeouts & Buffers
