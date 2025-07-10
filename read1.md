@@ -42,33 +42,59 @@ Version 1.1.0
 
 Version 1.1.1
 
-    Introduced SESSION_TIMEOUT variable in MDR charts.
-    → Set the default value of SESSION_TIMEOUT to 30 seconds.
-
-    Configured WAF settings for the load balancer.
-    → Added WAF ACL ARN to the load balancer using the ingress Kubernetes file.
-
-    Fixed the ingress tagging issue.
-    → Corrected the tag of the load balancer by adding the App=MDR tag.
+    Added SESSION_TIMEOUT Config to Common ConfigMap
+    → Introduced a new environment variable SESSION_TIMEOUT in common-cm.yaml, sourced from values.yaml under .Values.config.session_timeout.
 
 Version 1.1.2
 
-    Enabled Datadog profiling and database monitoring propagation.
-    → Set DD_TRACE_SAMPLE_RATE=1, DD_DBM_PROPAGATION_MODE=full, and enabled DB_POOL.
+    Application Deployment Improvements
+    → Introduced readinessProbe for NGINX using a status file (/app/status_running.sock) for better health signaling.
+      Added lifecycle postStart and preStop hooks to manage the status file and gracefully shut down NGINX.
+      Enabled Datadog APM/Profiling in the app container:
+        DD_PROFILING_ENABLED: true
+        DD_TRACE_SAMPLE_RATE: 1
+        DD_DBM_PROPAGATION_MODE: full
+        DD_TRACE_DELAYED_JOB_ENABLED: true
+
+    WAF Integration Support in ALB Ingress
+    → Introduced conditional support for AWS WAFv2 in ingress.yaml. 
+      When enabled in values.yaml (ingress.alb.waf.enabled: true), the following annotation is added to the ALB Ingress:
+      alb.ingress.kubernetes.io/wafv2-acl-arn: "<WAF_ACL_ARN_FROM_VALUES>"
+      This allows integration with AWS WAF for added security at the load balancer level.
+
+    PostgreSQL DBM Integration
+    → Enhanced the datadog-dbm-postgres-service.yaml to include:
+      Activity, statement, and function metrics collection.
+      Datadog tag added with: customer, org, app, app_type, and app_version.
 
 Version 1.1.3
 
-    Enabled maintenance mode.
-    → Set the default value of enable_maintenance_mode to false.
+    Maintenance mode changes
+    -> Wrapped resources like restart-cronjob.yaml, scaled-job.yaml, and scaled-object.yaml with conditional logic:
+        Respect global.enable_maintenance_mode to skip non-essential jobs in maintenance mode.
+    
+    Affinity & Scheduling Logic Updates
+    → Added custom affinity rules to prefer:
+        On-demand nodes and karpenter-managed pools.
+      Conditional rendering of tolerations, nodeSelector, and affinity rules.
 
-    Added node and pod affinity configurations.
-    → Included node selector and node affinity ON DEMAND value in the deployment file.
+    Delayed Job Workoff Improvements
+    → New Configurable Wait Logic Introduced:
+        Added wait block in values.yaml with:
+            enabled: Toggle wait mode for DJ worker.
+            wait_time: Max time (in seconds) to wait with no jobs before exiting.
+            sleep_interval: Polling interval between DJ job checks.
+    Custom Rake Task (workoff_wait):
+        Loops up to MAX_WAIT_TIME, processing jobs and waiting if none found.
+        Resets timer when jobs are processed, improving job handling efficiency.
+        Mounts workoff_wait.rake dynamically if wait.enabled: true.
 
-    Made Workoff_wait time optional and set the default flag to false.
-    → Included workoff-wait-rake in volumeMount for job scheduling.
-
-    Fixed Nginx host header and server fingerprinting issue.
-    → Included necessary headers in Nginx for transport security and proxy.
+    NGINX Configuration Updates
+    → Replaced default image with nginx-with-headers-module for enhanced security headers.
+      Security Enhancements:
+      Added more_clear_headers, proxy_hide_header, and disabled server_tokens.
+      Injected Strict-Transport-Security header.
+      Refactored and extended the nginx.conf to support custom modules and better control.
 
 Version 1.1.4
 
