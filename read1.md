@@ -70,8 +70,8 @@ Version 1.1.2
 Version 1.1.3
 
     Maintenance mode changes
-    -> Wrapped resources like restart-cronjob.yaml, scaled-job.yaml, and scaled-object.yaml with conditional logic:
-        Respect global.enable_maintenance_mode to skip non-essential jobs in maintenance mode.
+    → Wrapped resources like restart-cronjob.yaml, scaled-job.yaml, and scaled-object.yaml with conditional logic:
+      global.enable_maintenance_mode to skip non-essential jobs in maintenance mode.
     
     Affinity & Scheduling Logic Updates
     → Added custom affinity rules to prefer:
