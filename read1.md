@@ -138,21 +138,42 @@ Version 1.1.7
     Fixed TLS support for TLS 1.3.
     → Included SSL Policy: ELBSecurityPolicy-TLS13-1-3-2021-06 and configuration in nginx-cm.
 
+    Ingress & TLS Security Enhancements
+    → Updated: ingress.yaml and nginx-cm.yaml
+    Improved SSL Policy:
+    Replaced ssl_ciphers (legacy cipher list)
+
 Version 1.2.0
 
-    Removed AWS key dependency; added role-arn as an environment variable.
-    → Removed AWS secrets from the common-secret file and added role-arn in the helper configuration.
+    Credentials improvement
+    → Removed: AWS Secrets from Config and Secrets
+    Added IAM role annotation to serviceAccount helper
+    Removed AWS secrets from the common-secret file and added role-arn in the helper configuration.
 
 Version 1.2.1
 
-    Added support for TLS 1.2 and TLS 1.3.
-    → Included ssl_protocols TLSv1.3; in nginx-cm to enable TLS 1.3.
+    Security & Network Enhancements
+    → Ingress Config Update
+    File: app/templates/ingress.yaml
+    Change:
+        Upgraded SSL policy:
+            From: ELBSecurityPolicy-TLS13-1-2-2021-06
+            To: ELBSecurityPolicy-TLS13-1-3-2021-06
 
-    Improved database disconnect exception handling code.
-    → Added code in workoff_wait.rake to address database exceptions.
+    Nginx Configuration Hardened
+    → TLS Protocols Improved
+    File: nginx-cm.yaml
+    Change:
+        Removed: ssl_ciphers (legacy ciphers)
+        Added:
+            ssl_protocols TLSv1.3
+            ssl_conf_command Ciphersuites TLS_AES_256_GCM_SHA384:TLS_AES_128_GCM_SHA256:TLS_CHACHA20_POLY1305_SHA256
 
-    Scaled job processing by splitting into multiple groups based on resource requirements.
-    → Included ScaledJob (scaled-job-common and scaled-job-xlarge files).
+    Migration Control Flag
+    → File: migrate-db/templates/batch.yaml
+    Added conditional freshdb logic:
+        true → runs rails db:migrate_fresh
+        false → default db:migrate
+    default value:
+        freshdb: false
 
-    Disabled email notifications.
-    → Removed the DISABLE_EMAIL_NOTIFICATION flag from common-cm and values.yaml.
