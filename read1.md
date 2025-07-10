@@ -117,8 +117,12 @@ Version 1.1.5
 
 Version 1.1.6
 
-    Improved SIGTERM handling for delayed job workoff.
-    → Added code in workoff_wait.rake to manage jobs locked by pods.
+   Delayed Job Workoff with Graceful Shutdown
+   → Added graceful signal handling (SIGTERM, SIGINT)
+     forks child process to run Delayed::Worker.work_off in loop
+     Automatically releases locked jobs back to queue on shutdown
+     Enforces MAX_WAIT_TIME logic to terminate idle job runner
+     Logs job IDs and cleanup status
 
     Backup DB Job Introduced
     → Added: New backup-db job for DB backups
