@@ -32,11 +32,13 @@ Version 1.0.1
 
 Version 1.1.0
 
-    Added Sendgrid_username variable and API key for Miami release.
-    → Included Sendgrid username and API key in Kubernetes charts.
+    Added SendGrid Configuration for Miami release.
+    → Introduced SENDGRID_USERNAME environment variable in common-cm.yaml and corresponding value sendgrid_username in values.yaml under the Mail & SendGrid section.
 
-    Included AWS key as secrets.
-    → Added global secret prefix value in the Kubernetes secret file.
+    Added AWS Credentials to Secret Configuration
+    → Enhanced secrets.yaml to include two new secrets:
+      aws_access_key
+      aws_secret
 
 Version 1.1.1
 
