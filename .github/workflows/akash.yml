@@ -1,15 +1,17 @@
-# .github/workflows/manual-run.yaml
-name: Manual Job Trigger
+# .github/workflows/manual-name-input.yaml
+name: Manual Name Input Workflow
 
 on:
-  workflow_dispatch:  # 👈 Enables manual trigger via GitHub UI
+  workflow_dispatch:
+    inputs:
+      person_name:
+        description: 'Enter your name'
+        required: true
+        default: 'Ankit'
 
 jobs:
-  run-manually:
+  greet-person:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-
-      - name: Say Hello
-        run: echo "Hello, Akash! This job was triggered manually."
+      - name: Greet by name
+        run: echo "Hello, ${{ github.event.inputs.person_name }}!"
