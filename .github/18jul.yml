@@ -1,4 +1,4 @@
-name: Auto Deploy Workflow
+name: 18jul Deploy Workflow
 on:
   workflow_dispatch:
     inputs:
