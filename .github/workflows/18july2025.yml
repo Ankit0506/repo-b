@@ -1,0 +1,24 @@
+name: 18jul Deploy Workflow
+on:
+  workflow_dispatch:
+    inputs:
+      branch_to_deploy:
+        description: 'Branch to deploy'
+        required: true
+      customer:
+        description: 'customer to deploy'
+        required: true
+
+permissions:
+  id-token: write
+  contents: write
+
+jobs:
+  runtimeInfo: 
+    name: Print Runtime Environment details
+    runs-on: self-hosted
+    steps:
+      - name: Print deployment details
+        run: |
+          echo "${{ github.event.inputs.branch_to_deploy }}"
+          echo "${{ github.event.inputs.customer }}"
