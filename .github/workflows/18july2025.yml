@@ -1,30 +1,251 @@
-name: 18jul Deploy Workflow
-
+name: Staging Deploy Workflow
 on:
   workflow_dispatch:
     inputs:
-      branch_to_deploy:
-        description: 'Branch to deploy'
+      tag:
+        description: 'tag to deploy'
         required: true
       customer:
-        description: 'Customer to deploy'
+        description: 'customer to deploy'
         required: true
+        type: choice
+        options:
+          - sycamore-mdr-auto-ps
+          - sycamore-mdr-malta-staging-ps
+          - sycamore-mdr-miami-staging-ps
+          - sycamore-mdr-missouri-staging-ps
 
 permissions:
   id-token: write
   contents: write
+
+env:
+  organization: "sycamore"
+  repository: "mdr"
+  #tag: "${{ github.event.inputs.branch }}"
+  remote_branch_name: "${{ github.actor }}-${{ github.run_id }}"
+  branch_name: "${{ github.ref_name }}"
+  updated_tag: "${{ github.ref_name }}"
+  tag: "${{ github.event.inputs.tag }}"
+  customer: "${{ github.event.inputs.customer }}"
 
 jobs:
   runtimeInfo: 
     name: Print Runtime Environment details
     runs-on: self-hosted
     steps:
-      - name: Checkout specified branch
-        uses: actions/checkout@v4
+      - name: Show Runtime Env Values
+        run: |
+          echo "Running Staging Release workflow with the following Env Values:"
+          echo ""
+          echo "BRANCH_ENV_MAP: ${{ vars.BRANCH_ENV_MAP }}"
+          echo '${{ vars.BRANCH_ENV_MAP }}' | jq -r
+          echo "Deploying Branch: ${{ env.branch_name }}"
+          echo "organization: ${{ env.organization }}"
+          echo "repository: ${{ env.repository }}"
+          echo "tag: ${{ env.tag }}"
+          echo "full_env_name: ${{ env.full_env_name }}"
+          echo "remote_branch_name: ${{ env.remote_branch_name }}"
+          echo "region: ${{ env.region }}"
+          echo "github.base_ref: ${{ github.base_ref }}"
+          echo "GITHUB_WORKFLOW:$GITHUB_WORKFLOW"
+          echo "GITHUB_EVENT_NAME:$GITHUB_EVENT_NAME"
+          echo "GITHUB_EVENT_PATH:$GITHUB_EVENT_PATH"
+          echo "GITHUB_WORKSPACE:$GITHUB_WORKSPACE"
+          echo "GITHUB_SHA:$GITHUB_SHA"
+          echo "GITHUB_REF:$GITHUB_REF"
+          echo "GITHUB_HEAD_REF:$GITHUB_HEAD_REF"
+          echo "GITHUB_BASE_REF:$GITHUB_BASE_REF"
+          echo "GITHUB_REF_EXTRACT: ${GITHUB_REF##*/}"
+          echo "EXTRACT_GITHUB_REF_HEADS=$(echo ${GITHUB_REF#refs/heads/} | tr -d '.')"
+
+  build:
+    name: Build Docker Images
+    runs-on: self-hosted
+    environment: staging
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
         with:
           ref: ${{ env.branch_name }}
 
-      - name: Print deployment details
+      - name: Print Env details
         run: |
-          echo "Branch to deploy: ${{ github.event.inputs.branch_to_deploy }}"
-          echo "Customer: ${{ github.event.inputs.customer }}"
+            # Install jq for parsing JSON
+            sudo apt-get update && sudo apt-get install -y jq    
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: "${{ secrets.DOCKERHUB_USERNAME }}"
+          password: "${{ secrets.DOCKERHUB_TOKEN }}"
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2.1.0
+        with:
+          aws-region: "${{ secrets.ECR_REGION }}"
+          role-to-assume: "${{ secrets.ECR_IAM_ROLE }}"
+      
+      - name: Login to Amazon ECR Private Registry
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          mask-password: "true"
+
+      - name: Create Styleguide RSA Key
+        run: |
+          echo "${{ secrets.STYLEGUIDE_ID_RSA }}" | base64 -d > styleguide_id_rsa
+          echo "${{ secrets.STYLEGUIDE_ID_RSA_PUB }}" > styleguide_id_rsa.pub
+          chmod 400 styleguide_id_rsa*
+
+      - name: Build
+        id: build
+        env:
+          GITHUB_TOKEN: ${{ secrets.PRIVATE_REPO_ACCESS_TOKEN }}
+          ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
+          ECR_USERNAME: ${{ steps.login-ecr.outputs.docker_username_572421346362_dkr_ecr_us_east_2_amazonaws_com }}
+          ECR_PASSWORD: ${{ steps.login-ecr.outputs.docker_password_572421346362_dkr_ecr_us_east_2_amazonaws_com }}
+          ECR_REPO_ORG: "sycamore"
+        shell: bash
+        run: |
+          ./deploy/scripts/dockerize.sh -l -p -e
+
+  deploy:
+    name: Deploy Target Environment
+    needs:
+      - build
+    runs-on: self-hosted
+    steps:
+      - name: Checkout deployment-settings
+        uses: actions/checkout@v4
+        with:
+          ref: "main"
+          repository: "Sycamore/deployment-settings"
+          token: ${{ secrets.PRIVATE_REPO_ACCESS_TOKEN }}
+       
+      - name: Set Tag Environment Variable
+        run: echo "tag=${{ github.event.inputs.tag }}" >> $GITHUB_ENV
+      
+      - name: Configure git Remote
+        env:
+          GH_TOKEN: ${{ secrets.PRIVATE_REPO_ACCESS_TOKEN }}
+          BRANCH_NAME: ${{ env.remote_branch_name }}
+        run: |
+          echo $BRANCH_NAME=${{ env.remote_branch_name }}
+          echo "[$(date +%Y-%m-%dT%H:%M:%S%z)] configuring git..."
+          git config user.email "noreply@sycamoreinformatics.com"
+          git config user.name "GitHub Actions"
+
+          BRANCH_EXISTS=$(git ls-remote --heads origin $BRANCH_NAME)
+          if [[ -z ${BRANCH_EXISTS} ]]; then
+            echo "[$(date +%Y-%m-%dT%H:%M:%S%z)] branch does not exist"
+            git checkout -b $BRANCH_NAME
+          else
+            echo "[$(date +%Y-%m-%dT%H:%M:%S%z)] branch already exists"
+            git fetch
+            git switch $BRANCH_NAME
+          fi
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          cache: 'pip' # caching pip dependencies
+
+      - name: Install pip requirements
+        run: pip install -r requirements.txt
+      
+      - name: Install GH CLI
+        uses: dev-hanz-ops/install-gh-cli-action@v0.1.0
+        with:
+          gh-cli-version: 2.39.2
+
+      - name: Set customer Variable
+        run: echo "customer=${{ github.event.inputs.customer }}" >> $GITHUB_ENV
+
+      - name: Replace Environment file
+        run: |
+      
+          if [[ "$customer" == "sycamore-mdr-auto-ps" ]]; then
+            echo "environment_file_path=deployments/plat-stage/sycamore-mdr/envs/${env_name}.yaml" >> $GITHUB_ENV
+          elif [[ "$customer" == "sycamore-mdr-malta-staging-ps" ]]; then
+            echo "environment_file_path=deployments/plat-stage/sycamore-mdr/envs/${env_name}.yaml" >> $GITHUB_ENV
+          else
+            echo "Invalid customer: $customer"
+            exit 1
+          fi
+
+      - uses: infovista-opensource/setup-yq4@v0.9.3
+      - name: Update Environment Configurations with tag and timestamp
+        run: |
+          echo $environment_file_path
+          updatedAt=$(date +%Y%m%d%H%M%S)  
+          short_sha=$(echo "${{ github.sha }}" | cut -c1-7) 
+          updated_tag="${{ github.ref_name }}"    
+          image=${updated_tag} yq -i '.global.image.tag = strenv(image)' $environment_file_path
+          updatedAt=$updatedAt yq -i '.global.deployed_at = strenv(updatedAt)' $environment_file_path
+          git diff $environment_file_path   
+  
+      - name: Create PR in deployment-settings
+        env:
+            GH_TOKEN: ${{ secrets.PRIVATE_REPO_ACCESS_TOKEN }}
+        run: |
+          git status
+          BRANCH_NAME="${{ env.remote_branch_name }}"
+          BRANCH_EXISTS=$(git ls-remote --heads origin $BRANCH_NAME)
+  
+          PR_BODY=$(cat <<EOF
+          ## What
+
+          This pull request was created by the ${{ github.workflow }}  in the ${{ github.repository }} repository. This PR will do deployment in the staging cluster for ${{ env.tag }} in the ${{ env.full_env_name }} namespace
+  
+          ## Why
+
+          The deployment-settings repository manages ArgoCD deployments for all environments. This PR deploys a staging environment for ${{ env.tag }}
+  
+          ## References
+  
+          ${{ github.server_url }}/${{ github.repository }}/tree/${{ env.tag }}
+  
+          EOF
+          )
+  
+          git add .
+          echo "git add . - DONE"
+          if [[ -z ${BRANCH_EXISTS} ]]; then
+            CHANGES_EXIST="exists"
+          else
+            CHANGES_EXIST=$(git diff origin/$BRANCH_NAME)
+          fi
+          echo "CHANGES_EXISTS? . - $CHANGES_EXIST"
+          if [[ -z ${CHANGES_EXIST} ]]; then
+            echo "[$(date +%Y-%m-%dT%H:%M:%S%z)] no changes."
+          else
+            echo "[$(date +%Y-%m-%dT%H:%M:%S%z)] pushing changes..."
+            git commit -m "(github actions) creating new environment for staging deployment"
+            echo "git commit - DONE"
+            git push origin $BRANCH_NAME
+  
+            if [[ -z ${BRANCH_EXISTS} ]]; then
+              echo "[$(date +%Y-%m-%dT%H:%M:%S%z)] creating pull request..."
+              gh pr create \
+                --body "$PR_BODY" \
+                --title "feat: ${{ env.tag }} deployment" \
+                --head "$BRANCH_NAME" \
+                --label "deploy" \
+                --base "main"
+            else
+              echo "[$(date +%Y-%m-%dT%H:%M:%S%z)] pull request already exists"
+            fi
+  
+            #Merge PR
+            # echo "[$(date +%Y-%m-%dT%H:%M:%S%z)] merging pull request..."
+            # gh pr merge \
+            #   --merge \
+            #   --admin \
+            #   --delete-branch \
+            #   ${{ env.remote_branch_name }}
+          fi
+          echo "[$(date +%Y-%m-%dT%H:%M:%S%z)] done"
