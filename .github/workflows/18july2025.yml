@@ -1,4 +1,5 @@
 name: 18jul Deploy Workflow
+
 on:
   workflow_dispatch:
     inputs:
@@ -6,7 +7,7 @@ on:
         description: 'Branch to deploy'
         required: true
       customer:
-        description: 'customer to deploy'
+        description: 'Customer to deploy'
         required: true
 
 permissions:
@@ -18,7 +19,12 @@ jobs:
     name: Print Runtime Environment details
     runs-on: self-hosted
     steps:
+      - name: Checkout specified branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch_to_deploy }}
+
       - name: Print deployment details
         run: |
-          echo "${{ github.event.inputs.branch_to_deploy }}"
-          echo "${{ github.event.inputs.customer }}"
+          echo "Branch to deploy: ${{ github.event.inputs.branch_to_deploy }}"
+          echo "Customer: ${{ github.event.inputs.customer }}"
