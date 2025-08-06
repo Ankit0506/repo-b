@@ -1,4 +1,4 @@
-name: Auto Deploy Workflow
+name: 6 Aug
 on:
   push:
     branches:
