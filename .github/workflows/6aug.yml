@@ -32,7 +32,7 @@ env:
 jobs:
   runtimeInfo: 
     name: Print Runtime Environment details
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - name: Show Runtime Env Values
         run: |
@@ -107,7 +107,7 @@ jobs:
     name: Deploy Target Environment
     needs:
       - build
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout deployment-settings
         uses: actions/checkout@v4
