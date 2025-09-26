@@ -1,0 +1,92 @@
+name: Manual Window Workflow Runner
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "Select branch to run workflow on"
+        required: true
+        default: "MDR-Malta"
+        type: choice
+        options: 
+          - MDR-Malta
+          - main
+          - ar-24dev
+
+      browser:
+        description: "Select Browser"
+        required: true
+        default: "Chrome"
+        type: choice
+        options:
+          - Chrome
+          - Edge
+
+      environment:
+        description: "Select Environment to run"
+        required: true
+        default: "Malta"
+        type: choice
+        options:
+          - Malta
+          - Staging
+
+      headless:
+        description: "Headless mode (default: false) - its best to let it be false. Change it only if required"
+        required: true
+        default: "false"
+        
+      test_name:
+        description: "Enter test file name (say TC101431_MDR_MALTA_Smoke_EndToEndPart1.robot)"
+        required: true
+        default: "TC101431_MDR_MALTA_Smoke_EndToEndPart1.robot"
+jobs:
+  smoke-tests:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11' 
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pip
+            .pip_cache
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Ensure pip cache directory exists
+        shell: pwsh
+        run: |
+          if (-Not (Test-Path ".pip_cache")) {
+            mkdir ".pip_cache"
+          }
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install --cache-dir .pip_cache -r requirements.txt
+          pip install pywin32 webdriver-manager selenium
+
+      - name: Run Main.py
+        shell: pwsh
+        run: |
+          python Main.py `
+            --browser "${{ github.event.inputs.browser }}" `
+            --env "${{ github.event.inputs.environment }}" `
+            --headless "${{ github.event.inputs.headless }}" `
+            --test_name "${{ github.event.inputs.test_name }}"
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            Results/
